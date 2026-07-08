@@ -22,7 +22,7 @@
             --delete-bg: #fee2e2;
             --delete-text: #ef4444;
             --accent-checked: #82a4ff; 
-            --input-box-bg: #f1f5f9; /* 입력창 배경 분리용 */
+            --input-box-bg: #f1f5f9;
         }
 
         /* 다크 모드 */
@@ -42,7 +42,7 @@
                 --delete-bg: #3f1d1d;
                 --delete-text: #f87171;
                 --accent-checked: #a5c1ff; 
-                --input-box-bg: #15181e; /* 입력창 배경 분리용 */
+                --input-box-bg: #15181e;
             }
         }
 
@@ -161,7 +161,6 @@
 
         .controls h3 { font-size: 17px; font-weight: 700; color: var(--text-color); }
         
-        /* 기어 추가 버튼 -> 눈에 확 띄는 하얀색으로 수정 */
         .add-gear-btn {
             background: #ffffff;
             color: #121212;
@@ -216,7 +215,7 @@
             background: var(--bg-color);
             width: 100%; height: 90vh;
             border-radius: 28px 28px 0 0;
-            padding: 30px 20px;
+            padding: 24px 20px 10px; 
             display: flex; flex-direction: column;
             transform: translateY(100%);
             transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -226,113 +225,102 @@
 
         .modal-header {
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color);
+            margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color);
         }
-        .modal-title { font-size: 24px; font-weight: 800; color: var(--text-color); }
-        .close-btn { background: none; border: none; color: var(--btn-text); font-size: 32px; cursor: pointer; line-height: 1; }
+        .modal-title { font-size: 22px; font-weight: 800; color: var(--text-color); }
+        .close-btn { background: none; border: none; color: var(--btn-text); font-size: 32px; cursor: pointer; line-height: 1; margin-top: -5px; }
 
-        /* 가독성 대폭 개선된 입력 영역 (박스 디자인 적용) */
+        /* 공간을 초압축한 입력 영역 설계 (가로 2줄 배치) */
         .input-section {
             background: var(--input-box-bg);
-            padding: 16px;
-            border-radius: 18px;
-            margin-bottom: 20px;
+            padding: 12px 14px;
+            border-radius: 16px;
+            margin-bottom: 15px;
             border: 1px solid var(--border-color);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
         }
 
-        .input-label {
-            font-size: 13px;
-            font-weight: 800;
-            color: var(--btn-text);
-            margin-bottom: 10px;
-            margin-left: 4px;
+        .input-row {
+            display: flex; gap: 8px; align-items: center;
+        }
+        .input-row + .input-row {
+            margin-top: 8px;
         }
 
-        .input-group {
-            display: flex; gap: 10px;
-        }
-        .input-full-width {
-            width: 100%; padding: 14px 16px;
-            border-radius: 14px; border: 1px solid var(--border-color);
+        .compact-input {
+            flex: 1; min-width: 0; padding: 12px 14px;
+            border-radius: 10px; border: 1px solid var(--border-color);
             background: var(--card-bg); color: var(--text-color);
-            font-size: 15px; font-family: inherit; font-weight: 600;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            font-size: 14px; font-family: inherit; font-weight: 500;
         }
-        .input-full-width::placeholder { color: var(--btn-text); opacity: 0.7; }
-        .input-full-width:focus { outline: 2px solid var(--accent-checked); border-color: transparent;}
-        
-        .input-group input[type="text"] {
-            flex: 1; min-width: 0; padding: 16px;
-            border-radius: 14px; border: 1px solid var(--border-color);
-            background: var(--card-bg); color: var(--text-color);
-            font-size: 16px; font-family: inherit;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-        }
-        .input-group input[type="text"]:focus { outline: 2px solid var(--accent-checked); border-color: transparent;}
-        
-        .input-group button {
-            white-space: nowrap; flex-shrink: 0; padding: 0 24px;
-            border-radius: 14px; border: none;
+        .compact-input::placeholder { color: var(--btn-text); opacity: 0.7; }
+        .compact-input:focus { outline: 2px solid var(--accent-checked); border-color: transparent; }
+
+        .compact-btn {
+            white-space: nowrap; flex-shrink: 0; padding: 0 16px; height: 43px;
+            border-radius: 10px; border: none;
             background: var(--text-color); color: var(--bg-color);
-            font-weight: 800; font-size: 16px; font-family: inherit; cursor: pointer;
+            font-weight: 800; font-size: 14px; font-family: inherit; cursor: pointer;
         }
 
-        .checklist-option {
-            display: flex; align-items: center; gap: 10px;
-            font-size: 14px; color: var(--btn-text); font-weight: 600;
-            margin-top: 15px; padding-left: 5px;
+        .check-label {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 13px; font-weight: 700; color: var(--btn-text);
+            cursor: pointer; white-space: nowrap; flex-shrink: 0;
+            padding: 0 4px;
         }
-        .checklist-option input[type="checkbox"] { 
+        .check-label input[type="checkbox"] {
             accent-color: var(--accent-checked);
-            transform: scale(1.3); cursor: pointer; 
+            transform: scale(1.2); margin: 0; cursor: pointer;
         }
 
-        /* 리스트 스타일 (카테고리 헤더) */
-        .item-list { list-style: none; overflow-y: auto; flex: 1; padding-bottom: 20px; }
+        /* 리스트 스타일 */
+        .item-list { list-style: none; overflow-y: auto; flex: 1; padding-bottom: 10px; }
         
         .category-header {
-            font-size: 15px; font-weight: 800; color: var(--accent-checked);
-            margin: 20px 0 10px 5px; padding-bottom: 6px;
+            font-size: 14px; font-weight: 800; color: var(--accent-checked);
+            margin: 10px 0 6px 4px; padding-bottom: 4px;
             border-bottom: 2px solid var(--border-color);
         }
+        .category-header:first-child { margin-top: 0px; }
 
         .item-list li {
-            background: var(--card-bg); padding: 16px 20px; border-radius: 16px; margin-bottom: 10px;
+            background: var(--card-bg); padding: 12px 16px; border-radius: 14px; margin-bottom: 8px;
             display: flex; justify-content: space-between; align-items: center;
             border: 1px solid var(--border-color);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
         }
 
-        .item-content { display: flex; align-items: center; gap: 16px; flex: 1; overflow: hidden; }
+        .item-content { display: flex; align-items: center; gap: 12px; flex: 1; overflow: hidden; }
         
         .custom-checkbox {
             appearance: none; -webkit-appearance: none;
-            width: 24px; height: 24px; border: 2px solid var(--border-color);
+            width: 22px; height: 22px; border: 2px solid var(--border-color);
             border-radius: 50%; outline: none; cursor: pointer; position: relative;
             background-color: var(--input-bg); flex-shrink: 0; transition: all 0.2s ease;
         }
         .custom-checkbox:checked { background-color: var(--accent-checked); border-color: var(--accent-checked); }
         .custom-checkbox:checked::after {
-            content: ''; position: absolute; top: 4px; left: 8px;
-            width: 4px; height: 9px; border: solid #ffffff; 
-            border-width: 0 2.5px 2.5px 0; transform: rotate(45deg);
+            content: ''; position: absolute; top: 4px; left: 7px;
+            width: 4px; height: 8px; border: solid #ffffff; 
+            border-width: 0 2px 2px 0; transform: rotate(45deg);
         }
 
-        .item-text { font-size: 16px; font-weight: 500; word-break: break-word; transition: all 0.2s; color: var(--text-color); }
+        .item-text { font-size: 15px; font-weight: 500; word-break: break-word; transition: all 0.2s; color: var(--text-color); }
         .item-text.checked { text-decoration: line-through; color: var(--checked-color); opacity: 0.6; }
 
         /* 삭제 버튼 */
         .delete-btn {
             background: var(--delete-bg); color: var(--delete-text); border: none;
-            border-radius: 10px; padding: 8px 14px; font-size: 13px; font-weight: 700; cursor: pointer; flex-shrink: 0;
+            border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 700; cursor: pointer; flex-shrink: 0;
             font-family: inherit;
         }
         .delete-btn:active { opacity: 0.7; }
 
         .delete-gear-btn {
-            width: 100%; padding: 18px; background: transparent; color: var(--delete-text);
-            border: 2px dashed var(--border-color); border-radius: 16px; font-size: 15px; font-weight: 700; margin-top: 10px;
-            font-family: inherit; cursor: pointer;
+            width: 100%; padding: 14px; background: transparent; color: var(--delete-text);
+            border: 2px dashed var(--border-color); border-radius: 14px; font-size: 14px; font-weight: 700; margin-top: 10px; margin-bottom: 10px;
+            font-family: inherit; cursor: pointer; flex-shrink: 0;
         }
 
         .status-message { text-align: center; padding: 0 20px 20px; font-size: 15px; color: var(--btn-text); line-height: 1.6; }
@@ -368,30 +356,24 @@
             
             <div id="standard-inputs" style="display: none;">
                 <div class="input-section">
-                    <div class="input-label">📁 목록(카테고리) 설정</div>
-                    <input type="text" id="cat-input" class="input-full-width" placeholder="예: 살빼기, 건강, 자격증">
-                </div>
-                
-                <div class="input-section">
-                    <div class="input-label">📝 실제 내용 추가</div>
-                    <div class="input-group">
-                        <input type="text" id="item-input" placeholder="예: 아침 달리기 3km" onkeypress="handleKeyPress(event, 'standard')">
-                        <button onclick="addItem('standard')">추가</button>
-                    </div>
-                    <div class="checklist-option">
-                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-                            <input type="checkbox" id="use-checklist" checked> 이 항목에 체크리스트 적용하기
+                    <div class="input-row">
+                        <input type="text" id="cat-input" class="compact-input" placeholder="📁 목록 (예: 건강, 업무)">
+                        <label class="check-label">
+                            <input type="checkbox" id="use-checklist" checked> 체크박스
                         </label>
+                    </div>
+                    <div class="input-row">
+                        <input type="text" id="item-input" class="compact-input" placeholder="📝 할 일 내용 (예: 아침 달리기)" onkeypress="handleKeyPress(event, 'standard')">
+                        <button class="compact-btn" onclick="addItem('standard')">추가</button>
                     </div>
                 </div>
             </div>
 
             <div id="motto-inputs" style="display: none;">
                 <div class="input-section">
-                    <div class="input-label">✨ 나만의 좌우명 추가</div>
-                    <div class="input-group">
-                        <input type="text" id="motto-input" placeholder="메인 화면에 나타날 문구를 적어주세요" onkeypress="handleKeyPress(event, 'motto')">
-                        <button onclick="addItem('motto')">추가</button>
+                    <div class="input-row">
+                        <input type="text" id="motto-input" class="compact-input" placeholder="✨ 메인 화면에 나타날 문구 입력" onkeypress="handleKeyPress(event, 'motto')">
+                        <button class="compact-btn" onclick="addItem('motto')">추가</button>
                     </div>
                 </div>
             </div>
@@ -409,7 +391,7 @@
             '#E2F0CB', '#9FD8DF', '#F3C5FF', '#D4F0F0', '#FFC8A2', '#B9F2FF', '#D5AAFF'
         ];
         
-        // V4: 신앙 톱니바퀴 완벽 복구 (총 5개 기본 세팅)
+        // V4: 신앙 톱니바퀴 포함 기본 데이터
         const defaultData = [
             { id: 'gear_1', type: 'standard', name: '루틴', active: true, color: colorPalette[0], items: [{id: 1, category: '건강', text: '아침 물 한잔 마시기', hasCheck: true, isChecked: false}] },
             { id: 'gear_2', type: 'standard', name: '해야할 일', active: true, color: colorPalette[1], items: [{id: 2, category: '일상', text: '공과금 납부하기', hasCheck: true, isChecked: false}] },
@@ -418,7 +400,6 @@
             { id: 'gear_motto', type: 'motto', name: '좌우명', active: true, color: colorPalette[4], items: [{id: 5, text: '일부가 멈추더라도, 당신의 인생은 계속 돌아갑니다.'}, {id: 6, text: '완벽주의 버리기'}, {id: 7, text: '열심히 배우자'}] }
         ];
 
-        // 새로운 버전을 적용하기 위해 V4 사용
         let lifeData = JSON.parse(localStorage.getItem('lifeGearsDataV4')) || defaultData;
         let currentGearId = '';
 
@@ -427,10 +408,9 @@
             renderGears();
             renderControls();
             updateStatusMessage();
-            updateMottoDisplay(); // 사이트 열 때 좌우명 랜덤 표시
+            updateMottoDisplay();
         }
 
-        // 메인 화면 좌우명 랜덤 표시 기능
         function updateMottoDisplay() {
             const mottoGear = lifeData.find(g => g.type === 'motto');
             const descEl = document.getElementById('header-desc');
@@ -555,7 +535,7 @@
                 renderGears();
                 renderControls();
                 updateStatusMessage();
-                updateMottoDisplay(); // 지웠을 때 메인 문구도 리셋
+                updateMottoDisplay();
             }
         }
 
