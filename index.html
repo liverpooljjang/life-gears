@@ -502,7 +502,7 @@
                     li.innerHTML = `
                         <div class="item-content"><span class="item-text">${item.text}</span></div>
                         <div class="btn-group">
-                            <button class="action-btn edit-btn" onclick="openEditView(${item.id})">⚙️ 수정</button>
+                            <button class="action-btn delete-btn" onclick="deleteMottoItem(${item.id})">삭제</button>
                         </div>
                     `;
                     listEl.appendChild(li);
@@ -713,14 +713,25 @@
             if(e.key === 'Enter') callback(type);
         }
 
-        // 새롭게 변경된 항목 삭제 기능
+        // 바깥 리스트에서 즉시 지우는 좌우명 전용 삭제 기능
+        function deleteMottoItem(itemId) {
+            if (confirm("이 좌우명 항목을 정말 삭제하시겠습니까?")) {
+                const gear = lifeData.find(g => g.id === currentGearId);
+                gear.items = gear.items.filter(i => i.id !== itemId);
+                saveData();
+                renderList();
+                updateMottoDisplay();
+            }
+        }
+
+        // 일반 항목용 수정 페이지 내 삭제 기능
         function deleteCurrentItem() {
             if(confirm("이 항목을 정말 삭제하시겠습니까?")) {
                 const gear = lifeData.find(g => g.id === currentGearId);
                 gear.items = gear.items.filter(i => i.id !== currentEditingItemId);
                 saveData(); 
                 if(gear.type === 'motto') updateMottoDisplay();
-                closeEditView(); // 삭제 후 메인 뷰로 전환 및 렌더링
+                closeEditView();
             }
         }
 
