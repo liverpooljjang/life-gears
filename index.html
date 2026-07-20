@@ -49,7 +49,8 @@
             }
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        /* 기본 설정 (모바일 터치 하이라이트 제거 등) */
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body {
             font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
             background-color: var(--bg-color); color: var(--text-color);
@@ -62,7 +63,7 @@
         .auth-btn {
             background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-color);
             padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: 0.2s; -webkit-appearance: none;
         }
         .auth-btn:hover { background: var(--btn-bg); }
         
@@ -103,7 +104,7 @@
         
         .controls-actions { display: flex; gap: 8px; }
         .action-sm-btn {
-            background: #ffffff; color: #121212; border: 1px solid #ccc;
+            background: #ffffff; color: #121212; border: 1px solid #ccc; -webkit-appearance: none;
             padding: 8px 12px; border-radius: 10px; font-size: 13px; font-weight: 800; cursor: pointer;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: 0.2s;
         }
@@ -112,7 +113,7 @@
 
         .toggle-group { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
         .toggle-btn {
-            padding: 14px; border: none; border-radius: 14px; background: var(--btn-bg);
+            padding: 14px; border: none; border-radius: 14px; background: var(--btn-bg); -webkit-appearance: none;
             color: var(--btn-text); font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s;
         }
         .toggle-btn.active { background: var(--text-color); color: var(--bg-color); }
@@ -140,12 +141,15 @@
             background: none; border: none; font-size: 16px; cursor: pointer; opacity: 0.6; padding: 4px; transition: opacity 0.2s;
         }
         .edit-title-btn:hover { opacity: 1; }
-        .close-btn, .back-btn { background: none; border: none; color: var(--btn-text); cursor: pointer; }
+        .close-btn, .back-btn { background: none; border: none; color: var(--btn-text); cursor: pointer; -webkit-appearance: none; }
         .close-btn { font-size: 32px; line-height: 1; margin-top: -5px; }
         .back-btn { font-size: 16px; font-weight: 700; display: none; }
 
         #main-view, #edit-view, #all-list-view { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
         #edit-view, #all-list-view { display: none; overflow-y: auto; padding-bottom: 20px;}
+
+        /* 🌟 모바일 찌그러짐 방지 (flex-shrink: 0 복구) */
+        #standard-inputs, #motto-inputs { flex-shrink: 0; width: 100%; }
 
         .input-section {
             background: var(--input-box-bg); padding: 12px 14px; border-radius: 16px; margin-bottom: 15px;
@@ -155,14 +159,21 @@
         .input-row + .input-row { margin-top: 8px; }
         .compact-input {
             flex: 1; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border-color);
-            background: var(--card-bg); color: var(--text-color); font-size: 14px; font-family: inherit;
+            background: var(--card-bg); color: var(--text-color); font-size: 14px; font-family: inherit; -webkit-appearance: none;
         }
         .compact-input:focus { outline: 2px solid var(--accent-checked); border-color: transparent; }
         .compact-btn {
-            padding: 0 16px; height: 43px; border-radius: 10px; border: none;
-            background: var(--text-color); color: var(--bg-color); font-weight: 800; cursor: pointer;
+            padding: 0 16px; height: 43px; border-radius: 10px; border: none; -webkit-appearance: none; flex-shrink: 0;
+            background: var(--text-color); color: var(--bg-color); font-weight: 800; font-family: inherit; cursor: pointer;
         }
         .save-btn { background: var(--accent-checked); color: #fff; }
+
+        /* 🌟 체크박스 라벨 모바일 깨짐 방지 복구 */
+        .check-label {
+            display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--btn-text);
+            cursor: pointer; white-space: nowrap; flex-shrink: 0; padding: 0 4px;
+        }
+        .check-label input[type="checkbox"] { accent-color: var(--accent-checked); transform: scale(1.2); margin: 0; cursor: pointer; }
         
         .item-list { list-style: none; overflow-y: auto; flex: 1; padding-bottom: 10px; }
         .category-header { font-size: 14px; font-weight: 800; color: var(--accent-checked); margin: 15px 0 8px 4px; border-bottom: 2px solid var(--border-color); padding-bottom: 4px; }
@@ -171,26 +182,30 @@
             background: var(--card-bg); padding: 12px 16px; border-radius: 14px; margin-bottom: 8px;
             display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border-color); gap: 8px;
         }
-        .item-content { display: flex; align-items: center; gap: 12px; flex: 1; }
+        .item-content { display: flex; align-items: center; gap: 12px; flex: 1; overflow: hidden; }
+        
+        /* 🌟 iOS 사파리 체크박스 증발 방지 (-webkit-appearance 복구) */
         .custom-checkbox {
-            appearance: none; width: 22px; height: 22px; border: 2px solid var(--border-color);
-            border-radius: 50%; cursor: pointer; position: relative; background: var(--input-bg);
+            appearance: none; -webkit-appearance: none; width: 22px; height: 22px; border: 2px solid var(--border-color);
+            border-radius: 50%; outline: none; cursor: pointer; position: relative;
+            background-color: var(--input-bg); flex-shrink: 0; transition: all 0.2s ease;
         }
-        .custom-checkbox:checked { background: var(--accent-checked); border-color: var(--accent-checked); }
+        .custom-checkbox:checked { background-color: var(--accent-checked); border-color: var(--accent-checked); }
         .custom-checkbox:checked::after {
             content: ''; position: absolute; top: 4px; left: 7px; width: 4px; height: 8px; border: solid #ffffff; border-width: 0 2px 2px 0; transform: rotate(45deg);
         }
-        .item-text { font-size: 15px; font-weight: 500; color: var(--text-color); }
+
+        .item-text { font-size: 15px; font-weight: 500; color: var(--text-color); word-break: break-word; }
         .item-text.checked { text-decoration: line-through; color: var(--checked-color); opacity: 0.6; }
 
-        .btn-group { display: flex; gap: 6px; }
-        .action-btn { border: none; border-radius: 8px; padding: 6px 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
+        .btn-group { display: flex; gap: 6px; flex-shrink: 0; }
+        .action-btn { border: none; border-radius: 8px; padding: 6px 10px; font-size: 12px; font-weight: 700; cursor: pointer; -webkit-appearance: none; font-family: inherit;}
         .delete-btn { background: var(--delete-bg); color: var(--delete-text); }
         .edit-btn { background: var(--edit-bg); color: var(--edit-text); }
         .swap-btn { background: var(--btn-bg); color: var(--text-color); border: 1px solid var(--border-color); }
         
         .modal-footer { margin-top: 10px; flex-shrink: 0; padding-bottom: 10px; }
-        .delete-gear-btn { width: 100%; padding: 14px; background: transparent; color: var(--delete-text); border: 2px dashed var(--border-color); border-radius: 14px; font-size: 14px; font-weight: 700; cursor: pointer; }
+        .delete-gear-btn { width: 100%; padding: 14px; background: transparent; color: var(--delete-text); border: 2px dashed var(--border-color); border-radius: 14px; font-size: 14px; font-weight: 700; cursor: pointer; -webkit-appearance: none; font-family: inherit; flex-shrink: 0; }
         .status-message { text-align: center; padding: 0 20px 20px; font-size: 15px; color: var(--btn-text); line-height: 1.6; }
         
         .all-list-gear-title { font-size: 18px; font-weight: 800; margin: 20px 0 10px; color: var(--text-color); display: flex; align-items: center; gap: 8px; }
@@ -238,9 +253,11 @@
                 <div id="standard-inputs" style="display: none;">
                     <div class="input-section">
                         <div class="input-row">
-                            <!-- 🌟 엔터키(handleKeyPress) 완벽 복구 -->
                             <input type="text" id="cat-input" class="compact-input" placeholder="📁 목록 (예: 건강, 업무)">
-                            <label style="font-size:13px; font-weight:700;"><input type="checkbox" id="use-checklist" checked> 체크박스</label>
+                            <!-- 🌟 체크박스 라벨 원상 복구 -->
+                            <label class="check-label">
+                                <input type="checkbox" id="use-checklist" checked> 체크박스
+                            </label>
                         </div>
                         <div class="input-row">
                             <input type="text" id="item-input" class="compact-input" placeholder="📝 할 일 내용 추가" onkeypress="handleKeyPress(event, 'standard', addItem)">
@@ -267,7 +284,9 @@
                 <div class="input-section" id="edit-standard-fields">
                     <div class="input-row">
                         <input type="text" id="edit-cat-input" class="compact-input" placeholder="📁 목록">
-                        <label style="font-size:13px; font-weight:700;"><input type="checkbox" id="edit-use-checklist"> 체크박스</label>
+                        <label class="check-label">
+                            <input type="checkbox" id="edit-use-checklist"> 체크박스
+                        </label>
                     </div>
                     <div class="input-row">
                         <input type="text" id="edit-item-input" class="compact-input" placeholder="📝 할 일 내용">
@@ -277,7 +296,6 @@
                 <div class="category-header">🔄 대체 할 일 (플랜 B)</div>
                 <div class="input-section">
                     <div class="input-row">
-                        <!-- 🌟 여기도 엔터키 복구 -->
                         <input type="text" id="alt-input" class="compact-input" placeholder="예: 런닝머신 뛰기" onkeypress="handleKeyPress(event, null, addAlternative)">
                         <button class="compact-btn" onclick="addAlternative()">추가</button>
                     </div>
@@ -322,7 +340,6 @@
             checkDailyReset(); renderGears(); renderControls(); updateStatusMessage(); updateMottoDisplay();
         }
 
-        // 🌟 안드로이드 뒤로가기 대응 완벽 복구
         window.addEventListener('popstate', (e) => {
             if (document.getElementById('edit-view').style.display === 'flex' || document.getElementById('all-list-view').style.display === 'flex') {
                 closeAllViews();
@@ -336,7 +353,6 @@
             }
         });
 
-        // 🌟 엔터키 입력 완벽 복구
         function handleKeyPress(e, type, callback) {
             if (e.key === 'Enter') {
                 if (callback === addAlternative) callback();
@@ -435,7 +451,6 @@
             closeAllViews(); 
             document.getElementById('main-view').style.display = 'flex';
             
-            // 🌟 모달창 열 때 기존 입력칸 비워두기 기능 완벽 복구
             if (gear.type === 'motto') { 
                 document.getElementById('standard-inputs').style.display = 'none'; 
                 document.getElementById('motto-inputs').style.display = 'block';
@@ -633,7 +648,6 @@
                         window.updateStatusMessage();
                         window.updateMottoDisplay();
                         
-                        // 🌟 모달창이 열려있을 때 다른 기기에서 추가해도 실시간으로 목록에 추가됨!
                         if (window.getCurrentGearId()) {
                             window.renderList();
                         }
