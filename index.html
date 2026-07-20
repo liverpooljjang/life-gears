@@ -6,7 +6,7 @@
     <title>Life Gears</title>
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <style>
-        /* 라이트 모드 */
+        /* === 라이트 모드 (기본) === */
         :root {
             --bg-color: #f4f6f8;
             --text-color: #212529;
@@ -23,11 +23,11 @@
             --delete-text: #ef4444;
             --edit-bg: #e0f2fe;
             --edit-text: #0284c7;
-            --accent-checked: #82a4ff; 
+            --accent-checked: #a3c2ff; 
             --input-box-bg: #f1f5f9;
         }
 
-        /* 다크 모드 */
+        /* === 다크 모드 === */
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg-color: #0f1115;
@@ -38,47 +38,48 @@
                 --btn-bg: #2a313c;
                 --btn-text: #94a3b8;
                 --modal-overlay: rgba(0,0,0,0.8);
-                --checked-color: #64748b;
                 --gear-shadow: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
                 --gear-name-bg: rgba(30, 34, 42, 0.9);
                 --delete-bg: #3f1d1d;
                 --delete-text: #f87171;
                 --edit-bg: #164e63;
                 --edit-text: #38bdf8;
-                --accent-checked: #a5c1ff; 
+                --accent-checked: #bacfff; 
                 --input-box-bg: #15181e;
             }
         }
 
+        /* === 기본 설정 === */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-
         body {
             font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
-            transition: background-color 0.3s, color 0.3s;
+            background-color: var(--bg-color); color: var(--text-color);
+            display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh; overflow-x: hidden; transition: all 0.3s;
         }
 
-        header { text-align: center; padding: 40px 20px 10px; }
+        /* === 상단 헤더 및 로그인 === */
+        header { text-align: center; padding: 40px 20px 10px; width: 100%; position: relative; }
+        .auth-container { position: absolute; top: 15px; right: 20px; }
+        .auth-btn {
+            background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-color);
+            padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: 0.2s;
+        }
+        .auth-btn:hover { background: var(--btn-bg); }
+        
         header h1 { font-size: 28px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.5px; }
-        header p { font-size: 16px; color: var(--btn-text); line-height: 1.5; word-break: keep-all; font-weight: 500; }
+        header p { font-size: 16px; color: var(--btn-text); line-height: 1.5; font-weight: 500; }
 
-        /* 톱니바퀴 레이아웃 */
+        /* === 톱니바퀴 애니메이션 및 레이아웃 === */
         .gears-container {
             display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px 10px;
             justify-items: center; width: 100%; max-width: 280px; margin: 30px auto 40px;
         }
-
         .gear-wrapper {
             position: relative; width: 120px; height: 140px;
             display: flex; flex-direction: column; align-items: center; justify-content: flex-start; cursor: pointer;
         }
-
         .gear-svg { width: 100px; height: 100px; fill: none; stroke-width: 8; transition: all 0.5s ease; filter: var(--gear-shadow); }
         .gear-name {
             position: absolute; bottom: 5px; font-size: 14px; font-weight: 700;
@@ -89,14 +90,13 @@
 
         .spin-cw { animation: spinCW 8s linear infinite; }
         .spin-ccw { animation: spinCCW 8s linear infinite; }
+        @keyframes spinCW { 100% { transform: rotate(360deg); } }
+        @keyframes spinCCW { 100% { transform: rotate(-360deg); } }
         
         .stopped .gear-svg { animation-play-state: paused !important; stroke: var(--checked-color) !important; filter: none; opacity: 0.5; }
         .stopped .gear-name { color: var(--btn-text); opacity: 0.8; }
 
-        @keyframes spinCW { 100% { transform: rotate(360deg); } }
-        @keyframes spinCCW { 100% { transform: rotate(-360deg); } }
-
-        /* 동력 상태 제어 영역 */
+        /* === 동력 상태 제어 영역 === */
         .controls {
             width: 90%; max-width: 400px; background: var(--card-bg); padding: 24px;
             border-radius: 24px; margin-bottom: 40px; border: 1px solid var(--border-color);
@@ -105,13 +105,18 @@
         .controls-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .controls h3 { font-size: 17px; font-weight: 700; color: var(--text-color); }
         
-        .add-gear-btn {
-            background: #ffffff; color: #121212; border: 1px solid #ccc; padding: 8px 16px;
-            border-radius: 10px; font-size: 13px; font-weight: 800; cursor: pointer;
-            transition: opacity 0.2s, transform 0.1s; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        .controls-actions { display: flex; gap: 8px; }
+        
+        /* 버튼 하얀색 고정 수정 */
+        .action-sm-btn {
+            background: #ffffff; color: #121212; border: 1px solid #ccc;
+            padding: 8px 12px; border-radius: 10px; font-size: 13px; font-weight: 800; cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: 0.2s;
         }
-        @media (prefers-color-scheme: dark) { .add-gear-btn { border: none; } }
-        .add-gear-btn:active { opacity: 0.8; transform: scale(0.96); }
+        @media (prefers-color-scheme: dark) { 
+            .action-sm-btn { border: none; } 
+        }
+        .action-sm-btn:active { transform: scale(0.96); }
 
         .toggle-group { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
         .toggle-btn {
@@ -120,14 +125,13 @@
         }
         .toggle-btn.active { background: var(--text-color); color: var(--bg-color); }
 
-        /* 모달 및 체크리스트 UI */
+        /* === 모달(창) 공통 UI === */
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--modal-overlay);
             display: flex; align-items: flex-end; opacity: 0; pointer-events: none;
             transition: opacity 0.3s ease; z-index: 100;
         }
         .modal-overlay.show { opacity: 1; pointer-events: auto; }
-
         .modal-content {
             background: var(--bg-color); width: 100%; height: 90vh; border-radius: 28px 28px 0 0;
             padding: 24px 20px 10px; display: flex; flex-direction: column;
@@ -135,105 +139,88 @@
             box-shadow: 0 -10px 40px rgba(0,0,0,0.1); overflow: hidden;
         }
         .modal-overlay.show .modal-content { transform: translateY(0); }
-
+        
         .modal-header {
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); flex-shrink: 0;
         }
         .modal-title { font-size: 22px; font-weight: 800; color: var(--text-color); display: flex; align-items: center; gap: 8px;}
+        
+        .edit-title-btn {
+            background: none; border: none; font-size: 16px; cursor: pointer; opacity: 0.6;
+            padding: 4px; transition: opacity 0.2s;
+        }
+        .edit-title-btn:hover { opacity: 1; }
+        
         .close-btn, .back-btn { background: none; border: none; color: var(--btn-text); cursor: pointer; }
         .close-btn { font-size: 32px; line-height: 1; margin-top: -5px; }
         .back-btn { font-size: 16px; font-weight: 700; display: none; }
 
-        /* 뷰 컨트롤러 */
-        #main-view, #edit-view { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
-        #edit-view { display: none; overflow-y: auto; padding-bottom: 20px;}
+        /* === 뷰 컨트롤러 === */
+        #main-view, #edit-view, #all-list-view { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        #edit-view, #all-list-view { display: none; overflow-y: auto; padding-bottom: 20px;}
 
-        /* 입력 폼 */
+        /* === 입력 폼 & 체크리스트 UI === */
         .input-section {
             background: var(--input-box-bg); padding: 12px 14px; border-radius: 16px; margin-bottom: 15px;
-            border: 1px solid var(--border-color); box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); flex-shrink: 0;
+            border: 1px solid var(--border-color); flex-shrink: 0;
         }
         .input-row { display: flex; gap: 8px; align-items: center; }
         .input-row + .input-row { margin-top: 8px; }
-
         .compact-input {
-            flex: 1; min-width: 0; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border-color);
-            background: var(--card-bg); color: var(--text-color); font-size: 14px; font-family: inherit; font-weight: 500;
+            flex: 1; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border-color);
+            background: var(--card-bg); color: var(--text-color); font-size: 14px; font-family: inherit;
         }
-        .compact-input::placeholder { color: var(--btn-text); opacity: 0.7; }
         .compact-input:focus { outline: 2px solid var(--accent-checked); border-color: transparent; }
-
         .compact-btn {
-            white-space: nowrap; flex-shrink: 0; padding: 0 16px; height: 43px; border-radius: 10px; border: none;
-            background: var(--text-color); color: var(--bg-color); font-weight: 800; font-size: 14px; font-family: inherit; cursor: pointer;
+            padding: 0 16px; height: 43px; border-radius: 10px; border: none;
+            background: var(--text-color); color: var(--bg-color); font-weight: 800; cursor: pointer;
         }
         .save-btn { background: var(--accent-checked); color: #fff; }
-
-        .check-label {
-            display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--btn-text);
-            cursor: pointer; white-space: nowrap; flex-shrink: 0; padding: 0 4px;
-        }
-        .check-label input[type="checkbox"] { accent-color: var(--accent-checked); transform: scale(1.2); margin: 0; cursor: pointer; }
-
+        
         /* 리스트 스타일 */
         .item-list { list-style: none; overflow-y: auto; flex: 1; padding-bottom: 10px; }
+        .category-header { font-size: 14px; font-weight: 800; color: var(--accent-checked); margin: 15px 0 8px 4px; border-bottom: 2px solid var(--border-color); padding-bottom: 4px; }
         
-        .category-header {
-            font-size: 14px; font-weight: 800; color: var(--accent-checked);
-            margin: 10px 0 6px 4px; padding-bottom: 4px; border-bottom: 2px solid var(--border-color);
-        }
-        .category-header:first-child { margin-top: 0px; }
-
         .item-list li {
             background: var(--card-bg); padding: 12px 16px; border-radius: 14px; margin-bottom: 8px;
-            display: flex; justify-content: space-between; align-items: center;
-            border: 1px solid var(--border-color); box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-            gap: 8px;
+            display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border-color); gap: 8px;
         }
-
-        .item-content { display: flex; align-items: center; gap: 12px; flex: 1; overflow: hidden; }
-        
+        .item-content { display: flex; align-items: center; gap: 12px; flex: 1; }
         .custom-checkbox {
-            appearance: none; -webkit-appearance: none; width: 22px; height: 22px; border: 2px solid var(--border-color);
-            border-radius: 50%; outline: none; cursor: pointer; position: relative;
-            background-color: var(--input-bg); flex-shrink: 0; transition: all 0.2s ease;
+            appearance: none; width: 22px; height: 22px; border: 2px solid var(--border-color);
+            border-radius: 50%; cursor: pointer; position: relative; background: var(--input-bg);
         }
-        .custom-checkbox:checked { background-color: var(--accent-checked); border-color: var(--accent-checked); }
+        .custom-checkbox:checked { background: var(--accent-checked); border-color: var(--accent-checked); }
         .custom-checkbox:checked::after {
-            content: ''; position: absolute; top: 4px; left: 7px; width: 4px; height: 8px; border: solid #ffffff; 
-            border-width: 0 2px 2px 0; transform: rotate(45deg);
+            content: ''; position: absolute; top: 4px; left: 7px; width: 4px; height: 8px; border: solid #ffffff; border-width: 0 2px 2px 0; transform: rotate(45deg);
         }
-
-        .item-text { font-size: 15px; font-weight: 500; word-break: break-word; transition: all 0.2s; color: var(--text-color); }
+        .item-text { font-size: 15px; font-weight: 500; color: var(--text-color); }
         .item-text.checked { text-decoration: line-through; color: var(--checked-color); opacity: 0.6; }
 
-        /* 리스트 내 버튼들 */
-        .btn-group { display: flex; gap: 6px; flex-shrink: 0; }
-        .action-btn {
-            border: none; border-radius: 8px; padding: 6px 10px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit;
-        }
+        /* 버튼들 */
+        .btn-group { display: flex; gap: 6px; }
+        .action-btn { border: none; border-radius: 8px; padding: 6px 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
         .delete-btn { background: var(--delete-bg); color: var(--delete-text); }
         .edit-btn { background: var(--edit-bg); color: var(--edit-text); }
         .swap-btn { background: var(--btn-bg); color: var(--text-color); border: 1px solid var(--border-color); }
-        .action-btn:active { opacity: 0.7; }
-
-        /* 하단 관리 영역 */
+        
         .modal-footer { margin-top: 10px; flex-shrink: 0; padding-bottom: 10px; }
-        .delete-gear-btn {
-            width: 100%; padding: 14px; background: transparent; color: var(--delete-text);
-            border: 2px dashed var(--border-color); border-radius: 14px; font-size: 14px; font-weight: 700; margin: 0;
-            font-family: inherit; cursor: pointer; flex-shrink: 0;
-        }
-
+        .delete-gear-btn { width: 100%; padding: 14px; background: transparent; color: var(--delete-text); border: 2px dashed var(--border-color); border-radius: 14px; font-size: 14px; font-weight: 700; cursor: pointer; }
         .status-message { text-align: center; padding: 0 20px 20px; font-size: 15px; color: var(--btn-text); line-height: 1.6; }
         
-        .alt-desc { font-size: 13px; color: var(--btn-text); margin: -4px 0 10px 4px; font-weight: 500; word-break: keep-all;}
+        /* 전체 보기용 그룹 헤더 */
+        .all-list-gear-title { font-size: 18px; font-weight: 800; margin: 20px 0 10px; color: var(--text-color); display: flex; align-items: center; gap: 8px; }
+        .all-list-gear-title:first-child { margin-top: 0; }
+        .gear-color-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
     </style>
 </head>
 <body>
 
     <header>
+        <div class="auth-container">
+            <button class="auth-btn" id="auth-btn" onclick="toggleGoogleLogin()">구글 로그인</button>
+        </div>
         <h1>Life Gears</h1>
         <p id="header-desc">일부가 멈추더라도,<br>당신의 인생은 계속 돌아갑니다.</p>
     </header>
@@ -244,135 +231,136 @@
     <div class="controls">
         <div class="controls-header">
             <h3>동력 상태 제어</h3>
-            <button class="add-gear-btn" onclick="addNewGear()">+ 기어 추가</button>
+            <div class="controls-actions">
+                <button class="action-sm-btn" onclick="openAllListView()">전체 보기</button>
+                <button class="action-sm-btn" onclick="addNewGear()">+ 기어 추가</button>
+            </div>
         </div>
         <div class="toggle-group" id="toggle-group"></div>
     </div>
 
+    <!-- 메인 관리 모달 -->
     <div class="modal-overlay" id="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <button class="back-btn" id="modal-back-btn" onclick="closeEditView()">❮ 뒤로</button>
-                <div class="modal-title" id="modal-title">카테고리</div>
+                <div class="modal-title" id="modal-title">
+                    <span id="modal-title-text">카테고리</span>
+                    <button class="edit-title-btn" id="edit-title-btn" onclick="editGearName()">✏️</button>
+                </div>
                 <button class="close-btn" id="modal-close-btn" onclick="clickCloseModal()">×</button>
             </div>
             
+            <!-- 기본 뷰 (항목 리스트) -->
             <div id="main-view">
                 <div id="standard-inputs" style="display: none;">
                     <div class="input-section">
                         <div class="input-row">
                             <input type="text" id="cat-input" class="compact-input" placeholder="📁 목록 (예: 건강, 업무)">
-                            <label class="check-label">
-                                <input type="checkbox" id="use-checklist" checked> 체크박스
-                            </label>
+                            <label style="font-size:13px; font-weight:700;"><input type="checkbox" id="use-checklist" checked> 체크박스</label>
                         </div>
                         <div class="input-row">
-                            <input type="text" id="item-input" class="compact-input" placeholder="📝 할 일 내용 (예: 아침 달리기)" onkeypress="handleKeyPress(event, 'standard', addItem)">
+                            <input type="text" id="item-input" class="compact-input" placeholder="📝 할 일 내용 추가">
                             <button class="compact-btn" onclick="addItem('standard')">추가</button>
                         </div>
                     </div>
                 </div>
-
                 <div id="motto-inputs" style="display: none;">
                     <div class="input-section">
                         <div class="input-row">
-                            <input type="text" id="motto-input" class="compact-input" placeholder="✨ 메인 화면에 나타날 문구 입력" onkeypress="handleKeyPress(event, 'motto', addItem)">
+                            <input type="text" id="motto-input" class="compact-input" placeholder="✨ 화면에 나타날 문구 추가">
                             <button class="compact-btn" onclick="addItem('motto')">추가</button>
                         </div>
                     </div>
                 </div>
-
                 <ul class="item-list" id="item-list"></ul>
-
                 <div class="modal-footer">
-                    <button class="delete-gear-btn" id="delete-gear-btn" onclick="deleteCurrentGear()">이 톱니바퀴 완전히 삭제하기</button>
+                    <button class="delete-gear-btn" onclick="deleteCurrentGear()">이 톱니바퀴 삭제하기</button>
                 </div>
             </div>
 
+            <!-- 수정 뷰 -->
             <div id="edit-view">
                 <div class="category-header" style="margin-top:0;">내용 수정</div>
                 <div class="input-section" id="edit-standard-fields">
                     <div class="input-row">
                         <input type="text" id="edit-cat-input" class="compact-input" placeholder="📁 목록">
-                        <label class="check-label">
-                            <input type="checkbox" id="edit-use-checklist"> 체크박스
-                        </label>
+                        <label style="font-size:13px; font-weight:700;"><input type="checkbox" id="edit-use-checklist"> 체크박스</label>
                     </div>
                     <div class="input-row">
                         <input type="text" id="edit-item-input" class="compact-input" placeholder="📝 할 일 내용">
                         <button class="compact-btn save-btn" onclick="saveItemEdit()">저장</button>
                     </div>
                 </div>
-
                 <div class="category-header">🔄 대체 할 일 (플랜 B)</div>
-                <div class="alt-desc">비가 오거나 상황이 여의치 않을 때 대신할 수 있는 항목을 추가하고, 원할 때 '적용' 버튼을 눌러 교체하세요.</div>
                 <div class="input-section">
                     <div class="input-row">
-                        <input type="text" id="alt-input" class="compact-input" placeholder="예: 헬스장에서 런닝머신 뛰기" onkeypress="handleKeyPress(event, null, addAlternative)">
+                        <input type="text" id="alt-input" class="compact-input" placeholder="예: 런닝머신 뛰기">
                         <button class="compact-btn" onclick="addAlternative()">추가</button>
                     </div>
                 </div>
                 <ul class="item-list" id="alt-list" style="overflow-y: visible;"></ul>
-
                 <div class="modal-footer" style="margin-top: 20px;">
                     <button class="delete-gear-btn" onclick="deleteCurrentItem()">이 항목 삭제하기</button>
                 </div>
             </div>
-
+            
+            <!-- 전체 목록 보기 뷰 -->
+            <div id="all-list-view">
+                <div id="all-list-container"></div>
+            </div>
         </div>
     </div>
 
+    <!-- UI 구동 및 로컬 로직 스크립트 -->
     <script>
-        const colorPalette = [
-            '#B5EAD7', '#FFB7B2', '#C7CEEA', '#FFDAC1', '#FF9AA2', 
-            '#E2F0CB', '#9FD8DF', '#F3C5FF', '#D4F0F0', '#FFC8A2', '#B9F2FF', '#D5AAFF'
-        ];
-        
+        // === 초기 데이터 및 변수 ===
+        const colorPalette = ['#B5EAD7', '#FFB7B2', '#C7CEEA', '#FFDAC1', '#FF9AA2', '#E2F0CB', '#9FD8DF', '#F3C5FF', '#D4F0F0', '#FFC8A2'];
         const defaultData = [
-            { id: 'gear_motto', type: 'motto', name: '좌우명', active: true, color: colorPalette[4], items: [{id: 5, text: '일부가 멈추더라도, 당신의 인생은 계속 돌아갑니다.', alternatives: []}, {id: 6, text: '완벽주의 버리기', alternatives: []}, {id: 7, text: '열심히 배우자', alternatives: []}] },
-            { id: 'gear_1', type: 'standard', name: '루틴', active: true, color: colorPalette[0], items: [{id: 1, category: '건강', text: '아침 물 한잔 마시기', hasCheck: true, isChecked: false, alternatives: []}] },
-            { id: 'gear_2', type: 'standard', name: '해야할 일', active: true, color: colorPalette[1], items: [{id: 2, category: '일상', text: '공과금 납부하기', hasCheck: true, isChecked: false, alternatives: []}] },
-            { id: 'gear_3', type: 'standard', name: '하고싶은 일', active: true, color: colorPalette[2], items: [{id: 3, category: '여가', text: '주말에 영화 보기', hasCheck: true, isChecked: false, alternatives: []}] },
-            { id: 'gear_4', type: 'standard', name: '신앙', active: true, color: colorPalette[3], items: [{id: 4, category: '마음가짐', text: '잠들기 전 기도하기', hasCheck: true, isChecked: false, alternatives: []}] }
+            { id: 'gear_motto', type: 'motto', name: '좌우명', active: true, color: '#FF9AA2', items: [{id: 5, text: '일부가 멈추더라도, 당신의 인생은 계속 돌아갑니다.', alternatives: []}] },
+            { id: 'gear_1', type: 'standard', name: '루틴', active: true, color: '#B5EAD7', items: [{id: 1, category: '건강', text: '아침 물 한잔 마시기', hasCheck: true, isChecked: false, alternatives: []}] },
+            { id: 'gear_2', type: 'standard', name: '해야할 일', active: true, color: '#FFB7B2', items: [{id: 2, category: '일상', text: '공과금 납부하기', hasCheck: true, isChecked: false, alternatives: []}] }
         ];
 
-        let lifeData = JSON.parse(localStorage.getItem('lifeGearsDataV5')) || defaultData;
-        
-        // 하위 호환성 (alternatives 배열이 없는 기존 데이터 처리)
-        lifeData.forEach(gear => {
-            gear.items.forEach(item => {
-                if(!item.alternatives) item.alternatives = [];
-            });
-        });
-
+        let lifeData = JSON.parse(localStorage.getItem('lifeGearsDataV6')) || defaultData;
         let currentGearId = '';
         let currentEditingItemId = null;
+        let isLoggedIn = false; 
+
+        // 전역 함수로 등록하여 모듈(Firebase)에서 안전하게 접근 및 덮어쓰기가 가능하게 함
+        window.saveData = function() {
+            localStorage.setItem('lifeGearsDataV6', JSON.stringify(lifeData)); 
+        };
 
         function init() {
-            checkDailyReset();
-            renderGears();
-            renderControls();
-            updateStatusMessage();
+            checkDailyReset(); 
+            renderGears(); 
+            renderControls(); 
+            updateStatusMessage(); 
             updateMottoDisplay();
         }
 
-        window.addEventListener('popstate', (e) => {
-            if (document.getElementById('edit-view').style.display === 'flex') {
-                closeEditView();
-            } else if (document.getElementById('modal').classList.contains('show')) {
-                document.getElementById('modal').classList.remove('show');
-                currentGearId = '';
+        // === 렌더링 및 UI 업데이트 ===
+        function checkDailyReset() {
+            const today = new Date().toLocaleDateString();
+            if (localStorage.getItem('lifeGearsResetDate') !== today) {
+                lifeData.forEach(gear => {
+                    if (gear.type === 'standard') {
+                        gear.items.forEach(item => { 
+                            if (item.hasCheck) {
+                                item.isChecked = false; 
+                            }
+                        });
+                    }
+                });
+                localStorage.setItem('lifeGearsResetDate', today); 
+                window.saveData();
             }
-        });
-
-        function clickCloseModal() {
-            if (document.getElementById('modal').classList.contains('show')) history.back();
         }
 
         function updateMottoDisplay() {
             const mottoGear = lifeData.find(g => g.type === 'motto');
             const descEl = document.getElementById('header-desc');
-            
             if (mottoGear && mottoGear.items.length > 0) {
                 const randomIndex = Math.floor(Math.random() * mottoGear.items.length);
                 descEl.innerText = mottoGear.items[randomIndex].text;
@@ -381,31 +369,16 @@
             }
         }
 
-        function checkDailyReset() {
-            const today = new Date().toLocaleDateString();
-            const lastReset = localStorage.getItem('lifeGearsResetDate');
-            if (lastReset !== today) {
-                lifeData.forEach(gear => {
-                    if(gear.type === 'standard') {
-                        gear.items.forEach(item => { if (item.hasCheck) item.isChecked = false; });
-                    }
-                });
-                localStorage.setItem('lifeGearsResetDate', today);
-                saveData();
-            }
-        }
-
         function renderGears() {
-            const container = document.getElementById('gears-container');
+            const container = document.getElementById('gears-container'); 
             container.innerHTML = '';
+            
             lifeData.forEach((gear, index) => {
-                const spinClass = index % 2 === 0 ? 'spin-cw' : 'spin-ccw';
-                const stoppedClass = gear.active ? '' : 'stopped';
                 const wrapper = document.createElement('div');
-                wrapper.className = `gear-wrapper ${stoppedClass}`;
+                wrapper.className = `gear-wrapper ${gear.active ? '' : 'stopped'}`;
                 wrapper.onclick = () => openModal(gear.id);
                 wrapper.innerHTML = `
-                    <svg class="gear-svg ${spinClass}" viewBox="0 0 100 100" style="stroke: ${gear.color}">
+                    <svg class="gear-svg ${index % 2 === 0 ? 'spin-cw' : 'spin-ccw'}" viewBox="0 0 100 100" style="stroke: ${gear.color}">
                         <path d="M50 15 A35 35 0 1 0 50 85 A35 35 0 1 0 50 15 M50 35 A15 15 0 1 1 50 65 A15 15 0 1 1 50 35 M50 5 L50 15 M50 85 L50 95 M5 50 L15 50 M85 50 L95 50 M18 18 L25 25 M75 75 L82 82 M18 82 L25 75 M75 25 L82 18" stroke-linecap="round"/>
                     </svg>
                     <span class="gear-name">${gear.name}</span>
@@ -415,329 +388,440 @@
         }
 
         function renderControls() {
-            const group = document.getElementById('toggle-group');
+            const group = document.getElementById('toggle-group'); 
             group.innerHTML = '';
+            
             lifeData.forEach(gear => {
                 const btn = document.createElement('button');
                 btn.className = `toggle-btn ${gear.active ? 'active' : ''}`;
                 btn.innerText = gear.name;
-                btn.onclick = () => togglePower(gear.id);
+                btn.onclick = () => { 
+                    gear.active = !gear.active; 
+                    window.saveData(); 
+                    renderGears(); 
+                    renderControls(); 
+                    updateStatusMessage(); 
+                };
                 group.appendChild(btn);
             });
         }
 
-        function togglePower(gearId) {
-            const gear = lifeData.find(g => g.id === gearId);
-            gear.active = !gear.active;
-            saveData();
-            renderGears();
-            renderControls();
-            updateStatusMessage();
-        }
-
         function updateStatusMessage() {
             const total = lifeData.length;
-            const activeCount = lifeData.filter(g => g.active).length;
+            const active = lifeData.filter(g => g.active).length;
             const msgEl = document.getElementById('status-msg');
-            if (total === 0) msgEl.innerHTML = "등록된 톱니바퀴가 없습니다.<br>기어를 추가해보세요.";
-            else if (activeCount === total) msgEl.innerHTML = `${total}개의 톱니바퀴가 완벽하게 맞물려<br>당신의 삶을 이끌고 있습니다.`;
-            else if (activeCount > 0) msgEl.innerHTML = `잠시 멈춘 부분도 있지만,<br>남은 ${activeCount}개의 톱니바퀴가 인생을 굴러가게 합니다.`;
-            else msgEl.innerHTML = "모든 톱니바퀴가 멈췄습니다.<br>지금은 잠시 푹 쉬어가도 괜찮습니다.";
+            
+            if (total === 0) {
+                msgEl.innerHTML = "등록된 톱니바퀴가 없습니다.";
+            } else if (active === total) {
+                msgEl.innerHTML = `${total}개의 톱니바퀴가 완벽하게 맞물려 돌아가고 있습니다.`;
+            } else if (active > 0) {
+                msgEl.innerHTML = `잠시 멈춘 부분도 있지만, 남은 ${active}개의 톱니바퀴가 인생을 이끕니다.`;
+            } else {
+                msgEl.innerHTML = "모든 톱니바퀴가 멈췄습니다. 잠시 푹 쉬어가세요.";
+            }
         }
 
+        // === 기어 관리 및 기능 ===
         function addNewGear() {
-            const name = prompt("새로운 일반 톱니바퀴의 이름을 입력하세요:");
+            const name = prompt("새로운 기어의 이름을 입력하세요:");
             if (name && name.trim() !== "") {
                 const usedColors = lifeData.map(g => g.color);
-                const availableColors = colorPalette.filter(c => !usedColors.includes(c));
-                const newColor = availableColors.length > 0 ? availableColors[0] : colorPalette[Math.floor(Math.random() * colorPalette.length)];
-                lifeData.push({ id: 'gear_' + Date.now(), type: 'standard', name: name.trim(), active: true, color: newColor, items: [] });
-                saveData(); renderGears(); renderControls(); updateStatusMessage();
+                const available = colorPalette.filter(c => !usedColors.includes(c));
+                const gearColor = available.length > 0 ? available[0] : colorPalette[0];
+                
+                lifeData.push({ 
+                    id: 'gear_' + Date.now(), 
+                    type: 'standard', 
+                    name: name.trim(), 
+                    active: true, 
+                    color: gearColor, 
+                    items: [] 
+                });
+                
+                window.saveData(); 
+                renderGears(); 
+                renderControls(); 
+                updateStatusMessage();
             }
         }
 
         function deleteCurrentGear() {
-            const gearIndex = lifeData.findIndex(g => g.id === currentGearId);
-            const gear = lifeData[gearIndex];
-            const msg = gear.type === 'motto' ? `'${gear.name}' 톱니바퀴를 삭제하시겠습니까?\n(메인 화면 문구가 기본값으로 돌아갑니다)` : `'${gear.name}' 톱니바퀴를 정말 삭제하시겠습니까?`;
-            if(confirm(msg)) {
-                lifeData.splice(gearIndex, 1);
-                saveData(); clickCloseModal(); renderGears(); renderControls(); updateStatusMessage();
-                if(gear.type === 'motto') updateMottoDisplay();
-            }
-        }
-
-        function openModal(gearId) {
-            currentGearId = gearId;
-            const gear = lifeData.find(g => g.id === gearId);
-            
-            document.getElementById('modal-title').innerText = gear.name;
-            document.getElementById('modal').classList.add('show');
-            closeEditView(false); // 모달 열때 항상 메인 뷰로 초기화
-            
-            history.pushState({ modalOpen: true }, "");
-
-            if (gear.type === 'motto') {
-                document.getElementById('standard-inputs').style.display = 'none';
-                document.getElementById('motto-inputs').style.display = 'block';
-                document.getElementById('motto-input').value = '';
-            } else {
-                document.getElementById('standard-inputs').style.display = 'block';
-                document.getElementById('motto-inputs').style.display = 'none';
-                document.getElementById('cat-input').value = '';
-                document.getElementById('item-input').value = '';
-                document.getElementById('use-checklist').checked = true;
-            }
-            renderList();
-        }
-
-        function renderList() {
-            const listEl = document.getElementById('item-list');
-            listEl.innerHTML = '';
-            const gear = lifeData.find(g => g.id === currentGearId);
-            
-            if (gear.type === 'motto') {
-                gear.items.forEach(item => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `
-                        <div class="item-content"><span class="item-text">${item.text}</span></div>
-                        <div class="btn-group">
-                            <button class="action-btn delete-btn" onclick="deleteMottoItem(${item.id})">삭제</button>
-                        </div>
-                    `;
-                    listEl.appendChild(li);
-                });
-            } else {
-                const categories = [...new Set(gear.items.map(i => i.category))];
-                categories.forEach(cat => {
-                    const catHeader = document.createElement('div');
-                    catHeader.className = 'category-header';
-                    catHeader.innerText = cat || '기본 목록';
-                    listEl.appendChild(catHeader);
-                    
-                    gear.items.forEach(item => {
-                        if(item.category === cat) {
-                            const li = document.createElement('li');
-                            let checkboxHTML = '';
-                            let textClass = 'item-text';
-
-                            if (item.hasCheck) {
-                                const checkedAttr = item.isChecked ? 'checked' : '';
-                                checkboxHTML = `<input type="checkbox" class="custom-checkbox" onchange="toggleItemCheck(${item.id})" ${checkedAttr}>`;
-                                if (item.isChecked) textClass += ' checked';
-                            }
-                            
-                            // 대체 할 일이 있으면 아이콘 표시
-                            const altIndicator = item.alternatives && item.alternatives.length > 0 ? ' <span style="font-size:12px;">🔄</span>' : '';
-
-                            li.innerHTML = `
-                                <div class="item-content">
-                                    ${checkboxHTML}
-                                    <span class="${textClass}">${item.text}${altIndicator}</span>
-                                </div>
-                                <div class="btn-group">
-                                    <button class="action-btn edit-btn" onclick="openEditView(${item.id})">⚙️ 수정</button>
-                                </div>
-                            `;
-                            listEl.appendChild(li);
-                        }
-                    });
-                });
-            }
-        }
-
-        /* ---------------- 수정 & 대체 기능 로직 ---------------- */
-        
-        function openEditView(itemId) {
-            currentEditingItemId = itemId;
-            const gear = lifeData.find(g => g.id === currentGearId);
-            const item = gear.items.find(i => i.id === itemId);
-
-            document.getElementById('main-view').style.display = 'none';
-            document.getElementById('edit-view').style.display = 'flex';
-            
-            // 상단 헤더 변경
-            document.getElementById('modal-title').innerText = "항목 설정";
-            document.getElementById('modal-back-btn').style.display = 'block';
-            document.getElementById('modal-close-btn').style.display = 'none';
-
-            if (gear.type === 'motto') {
-                document.getElementById('edit-use-checklist').parentElement.style.display = 'none';
-                document.getElementById('edit-cat-input').style.display = 'none';
-            } else {
-                document.getElementById('edit-use-checklist').parentElement.style.display = 'flex';
-                document.getElementById('edit-cat-input').style.display = 'block';
-                document.getElementById('edit-cat-input').value = item.category || '';
-                document.getElementById('edit-use-checklist').checked = item.hasCheck;
-            }
-            
-            document.getElementById('edit-item-input').value = item.text;
-            history.pushState({ editOpen: true }, "");
-            
-            renderAlternatives();
-        }
-
-        function closeEditView(popHistory = true) {
-            currentEditingItemId = null;
-            document.getElementById('main-view').style.display = 'flex';
-            document.getElementById('edit-view').style.display = 'none';
-            
-            const gear = lifeData.find(g => g.id === currentGearId);
-            if(gear) document.getElementById('modal-title').innerText = gear.name;
-            
-            document.getElementById('modal-back-btn').style.display = 'none';
-            document.getElementById('modal-close-btn').style.display = 'block';
-            
-            renderList();
-        }
-
-        function saveItemEdit() {
-            const gear = lifeData.find(g => g.id === currentGearId);
-            const item = gear.items.find(i => i.id === currentEditingItemId);
-            
-            const newText = document.getElementById('edit-item-input').value.trim();
-            if(!newText) { alert("내용을 입력해주세요."); return; }
-
-            item.text = newText;
-            if (gear.type !== 'motto') {
-                item.category = document.getElementById('edit-cat-input').value.trim() || '기본 목록';
-                item.hasCheck = document.getElementById('edit-use-checklist').checked;
-            }
-            
-            saveData();
-            // 수정 완료 시 닫지 않고 토스트나 알림 대신 버튼 효과만 주어도 좋음.
-            alert("수정되었습니다.");
-            if(gear.type === 'motto') updateMottoDisplay();
-        }
-
-        function renderAlternatives() {
-            const altListEl = document.getElementById('alt-list');
-            altListEl.innerHTML = '';
-            
-            const gear = lifeData.find(g => g.id === currentGearId);
-            const item = gear.items.find(i => i.id === currentEditingItemId);
-            
-            if(!item.alternatives) item.alternatives = [];
-
-            if(item.alternatives.length === 0) {
-                altListEl.innerHTML = '<div style="text-align:center; padding: 10px; color:var(--btn-text); font-size:13px;">등록된 대체 할 일이 없습니다.</div>';
-                return;
-            }
-
-            item.alternatives.forEach(alt => {
-                const li = document.createElement('li');
-                li.innerHTML = `
-                    <div class="item-content"><span class="item-text" style="font-size:14px;">${alt.text}</span></div>
-                    <div class="btn-group">
-                        <button class="action-btn swap-btn" onclick="swapAlternative(${alt.id})">적용</button>
-                        <button class="action-btn delete-btn" onclick="deleteAlternative(${alt.id})">삭제</button>
-                    </div>
-                `;
-                altListEl.appendChild(li);
-            });
-        }
-
-        function addAlternative() {
-            const inputEl = document.getElementById('alt-input');
-            const text = inputEl.value.trim();
-            if(!text) return;
-
-            const gear = lifeData.find(g => g.id === currentGearId);
-            const item = gear.items.find(i => i.id === currentEditingItemId);
-            
-            item.alternatives.push({ id: Date.now(), text: text });
-            inputEl.value = '';
-            saveData();
-            renderAlternatives();
-        }
-
-        function deleteAlternative(altId) {
-            const gear = lifeData.find(g => g.id === currentGearId);
-            const item = gear.items.find(i => i.id === currentEditingItemId);
-            item.alternatives = item.alternatives.filter(a => a.id !== altId);
-            saveData();
-            renderAlternatives();
-        }
-
-        function swapAlternative(altId) {
-            const gear = lifeData.find(g => g.id === currentGearId);
-            const item = gear.items.find(i => i.id === currentEditingItemId);
-            const altIndex = item.alternatives.findIndex(a => a.id === altId);
-            
-            if(altIndex > -1) {
-                const oldMainText = item.text;
-                item.text = item.alternatives[altIndex].text; // 메인 텍스트 변경
-                item.alternatives[altIndex].text = oldMainText; // 기존 텍스트를 대체 목록으로 밀어넣음
-                item.isChecked = false; // 대체되었으므로 체크 해제
-                
-                document.getElementById('edit-item-input').value = item.text;
-                saveData();
-                renderAlternatives();
-                alert("항목이 교체되었습니다!");
-            }
-        }
-
-        /* -------------------------------------------------------- */
-
-        function addItem(type) {
-            const gear = lifeData.find(g => g.id === currentGearId);
-            if (type === 'motto') {
-                const val = document.getElementById('motto-input').value.trim();
-                if(val) {
-                    gear.items.push({ id: Date.now(), text: val, alternatives: [] });
-                    document.getElementById('motto-input').value = '';
-                }
-            } else {
-                const catVal = document.getElementById('cat-input').value.trim();
-                const itemVal = document.getElementById('item-input').value.trim();
-                const useChecklist = document.getElementById('use-checklist').checked;
-                
-                if(itemVal) {
-                    gear.items.push({
-                        id: Date.now(), category: catVal || '기본 목록', text: itemVal,
-                        hasCheck: useChecklist, isChecked: false, alternatives: []
-                    });
-                    document.getElementById('item-input').value = '';
-                }
-            }
-            saveData(); renderList(); if(type === 'motto') updateMottoDisplay();
-        }
-
-        function toggleItemCheck(itemId) {
-            const gear = lifeData.find(g => g.id === currentGearId);
-            const item = gear.items.find(i => i.id === itemId);
-            if(item) { item.isChecked = !item.isChecked; saveData(); renderList(); }
-        }
-
-        function handleKeyPress(e, type, callback) {
-            if(e.key === 'Enter') callback(type);
-        }
-
-        // 바깥 리스트에서 즉시 지우는 좌우명 전용 삭제 기능
-        function deleteMottoItem(itemId) {
-            if (confirm("이 좌우명 항목을 정말 삭제하시겠습니까?")) {
-                const gear = lifeData.find(g => g.id === currentGearId);
-                gear.items = gear.items.filter(i => i.id !== itemId);
-                saveData();
-                renderList();
+            if (confirm("정말 이 톱니바퀴를 삭제하시겠습니까?")) {
+                lifeData = lifeData.filter(g => g.id !== currentGearId);
+                window.saveData(); 
+                clickCloseModal(); 
+                renderGears(); 
+                renderControls(); 
+                updateStatusMessage(); 
                 updateMottoDisplay();
             }
         }
 
-        // 일반 항목용 수정 페이지 내 삭제 기능
+        function editGearName() {
+            const gear = lifeData.find(g => g.id === currentGearId);
+            const newName = prompt("톱니바퀴의 새 이름을 입력하세요:", gear.name);
+            
+            if (newName && newName.trim() !== "") {
+                gear.name = newName.trim();
+                window.saveData();
+                document.getElementById('modal-title-text').innerText = gear.name;
+                renderGears(); 
+                renderControls();
+            }
+        }
+
+        // === 모달 제어 ===
+        function openModal(gearId) {
+            currentGearId = gearId; 
+            const gear = lifeData.find(g => g.id === gearId);
+            
+            document.getElementById('modal-title-text').innerText = gear.name;
+            document.getElementById('edit-title-btn').style.display = 'block'; 
+            document.getElementById('modal').classList.add('show');
+            closeAllViews(); 
+            document.getElementById('main-view').style.display = 'flex';
+            
+            if (gear.type === 'motto') {
+                document.getElementById('standard-inputs').style.display = 'none';
+                document.getElementById('motto-inputs').style.display = 'block';
+            } else {
+                document.getElementById('standard-inputs').style.display = 'block';
+                document.getElementById('motto-inputs').style.display = 'none';
+            }
+            renderList();
+        }
+
+        function clickCloseModal() { 
+            document.getElementById('modal').classList.remove('show'); 
+            currentGearId = ''; 
+        }
+
+        function openAllListView() {
+            document.getElementById('modal').classList.add('show');
+            document.getElementById('modal-title-text').innerText = "전체 목록 보기";
+            document.getElementById('edit-title-btn').style.display = 'none'; 
+            closeAllViews(); 
+            document.getElementById('all-list-view').style.display = 'flex';
+
+            const container = document.getElementById('all-list-container');
+            container.innerHTML = '';
+            
+            lifeData.forEach(gear => {
+                if (gear.items.length === 0) return;
+                
+                const title = document.createElement('div');
+                title.className = 'all-list-gear-title';
+                title.innerHTML = `<span class="gear-color-dot" style="background:${gear.color}"></span> ${gear.name}`;
+                container.appendChild(title);
+                
+                const list = document.createElement('ul');
+                list.className = 'item-list';
+                
+                gear.items.forEach(item => {
+                    const li = document.createElement('li');
+                    li.style.padding = "8px 12px";
+                    let checkedStr = item.isChecked ? 'checked' : '';
+                    let checkBoxHTML = item.hasCheck ? `<input type="checkbox" class="custom-checkbox" onclick="return false;" ${checkedStr}>` : '';
+                    li.innerHTML = `<div class="item-content">${checkBoxHTML} <span class="item-text ${checkedStr}">${item.category ? '['+item.category+'] ' : ''}${item.text}</span></div>`;
+                    list.appendChild(li);
+                });
+                
+                container.appendChild(list);
+            });
+        }
+
+        function closeAllViews() {
+            document.getElementById('main-view').style.display = 'none';
+            document.getElementById('edit-view').style.display = 'none';
+            document.getElementById('all-list-view').style.display = 'none';
+            document.getElementById('modal-close-btn').style.display = 'block';
+            document.getElementById('modal-back-btn').style.display = 'none';
+        }
+
+        // === 세부 항목 렌더링 및 기능들 ===
+        function renderList() {
+            const listEl = document.getElementById('item-list'); 
+            listEl.innerHTML = '';
+            const gear = lifeData.find(g => g.id === currentGearId);
+            
+            if (!gear) return;
+
+            if (gear.type === 'motto') {
+                gear.items.forEach(item => {
+                    listEl.innerHTML += `
+                        <li>
+                            <div class="item-content"><span class="item-text">${item.text}</span></div>
+                            <div class="btn-group">
+                                <button class="action-btn delete-btn" onclick="deleteMotto(${item.id})">삭제</button>
+                            </div>
+                        </li>`;
+                });
+            } else {
+                const categories = [...new Set(gear.items.map(i => i.category))];
+                categories.forEach(cat => {
+                    listEl.innerHTML += `<div class="category-header">${cat || '기본 목록'}</div>`;
+                    
+                    gear.items.filter(i => i.category === cat).forEach(item => {
+                        const checkHTML = item.hasCheck ? `<input type="checkbox" class="custom-checkbox" onchange="toggleCheck(${item.id})" ${item.isChecked ? 'checked' : ''}>` : '';
+                        listEl.innerHTML += `
+                            <li>
+                                <div class="item-content">${checkHTML}<span class="item-text ${item.isChecked ? 'checked' : ''}">${item.text}</span></div>
+                                <div class="btn-group">
+                                    <button class="action-btn edit-btn" onclick="openEditView(${item.id})">⚙️ 수정</button>
+                                </div>
+                            </li>`;
+                    });
+                });
+            }
+        }
+
+        function addItem(type) {
+            const gear = lifeData.find(g => g.id === currentGearId);
+            
+            if (type === 'motto') {
+                const val = document.getElementById('motto-input').value.trim();
+                if (val) { 
+                    gear.items.push({ id: Date.now(), text: val, alternatives: [] }); 
+                    document.getElementById('motto-input').value = ''; 
+                }
+            } else {
+                const cat = document.getElementById('cat-input').value.trim() || '기본 목록';
+                const text = document.getElementById('item-input').value.trim();
+                const hasCheck = document.getElementById('use-checklist').checked;
+                
+                if (text) { 
+                    gear.items.push({ id: Date.now(), category: cat, text: text, hasCheck, isChecked: false, alternatives: [] }); 
+                    document.getElementById('item-input').value = ''; 
+                }
+            }
+            
+            window.saveData(); 
+            renderList(); 
+            
+            if (type === 'motto') {
+                updateMottoDisplay();
+            }
+        }
+
+        function toggleCheck(id) {
+            const item = lifeData.find(g => g.id === currentGearId).items.find(i => i.id === id);
+            if (item) { 
+                item.isChecked = !item.isChecked; 
+                window.saveData(); 
+                renderList(); 
+            }
+        }
+
+        function deleteMotto(id) {
+            if (confirm("이 좌우명을 삭제할까요?")) { 
+                const gear = lifeData.find(g => g.id === currentGearId);
+                gear.items = gear.items.filter(i => i.id !== id); 
+                window.saveData(); 
+                renderList(); 
+                updateMottoDisplay(); 
+            }
+        }
+
+        // 아이템 수정 화면
+        function openEditView(itemId) {
+            currentEditingItemId = itemId;
+            const item = lifeData.find(g => g.id === currentGearId).items.find(i => i.id === itemId);
+            
+            closeAllViews(); 
+            document.getElementById('edit-view').style.display = 'flex';
+            document.getElementById('modal-title-text').innerText = "항목 설정";
+            document.getElementById('edit-title-btn').style.display = 'none'; 
+            document.getElementById('modal-back-btn').style.display = 'block'; 
+            document.getElementById('modal-close-btn').style.display = 'none';
+            
+            document.getElementById('edit-cat-input').value = item.category || '';
+            document.getElementById('edit-item-input').value = item.text;
+            document.getElementById('edit-use-checklist').checked = item.hasCheck;
+            
+            renderAlts();
+        }
+
+        function closeEditView() {
+            currentEditingItemId = null;
+            openModal(currentGearId); 
+        }
+
+        function saveItemEdit() {
+            const item = lifeData.find(g => g.id === currentGearId).items.find(i => i.id === currentEditingItemId);
+            const inputVal = document.getElementById('edit-item-input').value.trim();
+            
+            if (inputVal === "") return;
+            
+            item.text = inputVal;
+            item.category = document.getElementById('edit-cat-input').value.trim() || '기본 목록';
+            item.hasCheck = document.getElementById('edit-use-checklist').checked;
+            
+            window.saveData(); 
+            alert("수정되었습니다."); 
+            closeEditView();
+        }
+
         function deleteCurrentItem() {
-            if(confirm("이 항목을 정말 삭제하시겠습니까?")) {
+            if (confirm("이 항목을 삭제할까요?")) {
                 const gear = lifeData.find(g => g.id === currentGearId);
                 gear.items = gear.items.filter(i => i.id !== currentEditingItemId);
-                saveData(); 
-                if(gear.type === 'motto') updateMottoDisplay();
+                
+                window.saveData(); 
                 closeEditView();
             }
         }
 
-        function saveData() { localStorage.setItem('lifeGearsDataV5', JSON.stringify(lifeData)); }
+        // 플랜 B (대체)
+        function renderAlts() {
+            const list = document.getElementById('alt-list'); 
+            list.innerHTML = '';
+            const item = lifeData.find(g => g.id === currentGearId).items.find(i => i.id === currentEditingItemId);
+            
+            if (!item.alternatives || item.alternatives.length === 0) { 
+                list.innerHTML = '<div style="text-align:center; padding: 10px; font-size:13px; color:var(--btn-text);">대체 할 일이 없습니다.</div>'; 
+                return; 
+            }
+            
+            item.alternatives.forEach(alt => {
+                list.innerHTML += `
+                    <li>
+                        <div class="item-content"><span class="item-text" style="font-size:14px;">${alt.text}</span></div>
+                        <div class="btn-group">
+                            <button class="action-btn swap-btn" onclick="swapAlt(${alt.id})">적용</button>
+                            <button class="action-btn delete-btn" onclick="delAlt(${alt.id})">삭제</button>
+                        </div>
+                    </li>`;
+            });
+        }
+
+        function addAlternative() {
+            const text = document.getElementById('alt-input').value.trim();
+            
+            if (text) { 
+                const item = lifeData.find(g => g.id === currentGearId).items.find(i => i.id === currentEditingItemId);
+                item.alternatives.push({id: Date.now(), text}); 
+                document.getElementById('alt-input').value = ''; 
+                
+                window.saveData(); 
+                renderAlts();
+            }
+        }
+
+        function delAlt(id) {
+            const item = lifeData.find(g => g.id === currentGearId).items.find(i => i.id === currentEditingItemId);
+            item.alternatives = item.alternatives.filter(a => a.id !== id); 
+            
+            window.saveData(); 
+            renderAlts();
+        }
+
+        function swapAlt(id) {
+            const item = lifeData.find(g => g.id === currentGearId).items.find(i => i.id === currentEditingItemId);
+            const alt = item.alternatives.find(a => a.id === id);
+            
+            if (alt) {
+                const oldText = item.text; 
+                item.text = alt.text; 
+                alt.text = oldText; 
+                item.isChecked = false;
+                
+                document.getElementById('edit-item-input').value = item.text; 
+                window.saveData(); 
+                renderAlts(); 
+                alert("교체되었습니다!");
+            }
+        }
 
         init();
+    </script>
+
+    <!-- 파이어베이스 연동 스크립트 (기존 <script>가 끝나는 바로 밑, </body> 바로 위에 위치) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // 사용자의 파이어베이스 Config 값
+        const firebaseConfig = {
+            apiKey: "AIzaSyAfJjOFdJsEKmmQb1snAKvwoswyLL_7OOg",
+            authDomain: "lifegears-d7496.firebaseapp.com",
+            projectId: "lifegears-d7496",
+            storageBucket: "lifegears-d7496.firebasestorage.app",
+            messagingSenderId: "613182130679",
+            appId: "1:613182130679:web:583b08a1060c1a363cc6f2"
+        };
+
+        // 파이어베이스 실행
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        // 기존 구글 로그인 버튼 동작 덮어쓰기
+        window.toggleGoogleLogin = () => {
+            if (!window.isLoggedIn) {
+                signInWithPopup(auth, provider).catch(error => {
+                    console.error("로그인 에러:", error);
+                    alert("로그인 중 오류가 발생했습니다. 브라우저 팝업 차단을 확인해주세요.");
+                });
+            } else {
+                if(confirm("로그아웃 하시겠습니까?")) signOut(auth);
+            }
+        };
+
+        // 로그인 상태 감지 및 데이터 동기화
+        onAuthStateChanged(auth, async (user) => {
+            const authBtn = document.getElementById('auth-btn');
+            if (user) {
+                window.isLoggedIn = true;
+                authBtn.innerText = "구글 로그아웃";
+                authBtn.style.background = "var(--btn-bg)";
+                
+                // 로그인 성공 시 DB에서 내 데이터 불러오기
+                try {
+                    const docRef = doc(db, "users", user.uid);
+                    const docSnap = await getDoc(docRef);
+                    
+                    if (docSnap.exists() && docSnap.data().lifeGearsData) {
+                        window.lifeData = docSnap.data().lifeGearsData;
+                        // 화면 데이터 갱신
+                        window.checkDailyReset();
+                        window.renderGears();
+                        window.renderControls();
+                        window.updateStatusMessage();
+                        window.updateMottoDisplay();
+                    } else {
+                        // 첫 로그인(가입자)이라면 현재 화면의 기본 데이터를 DB에 저장
+                        await setDoc(docRef, { lifeGearsData: window.lifeData });
+                    }
+                } catch (error) {
+                    console.error("데이터 불러오기 에러:", error);
+                }
+            } else {
+                window.isLoggedIn = false;
+                authBtn.innerText = "구글 로그인";
+                authBtn.style.background = "var(--card-bg)";
+            }
+        });
+
+        // 기존 saveData 기능 덮어쓰기 (로컬 + 클라우드 동시 저장)
+        const originalSaveData = window.saveData;
+        window.saveData = async () => {
+            // 1. 혹시 모를 오프라인을 대비해 기존처럼 기기(브라우저)에도 저장
+            originalSaveData();
+            
+            // 2. 로그인 되어있으면 클라우드(Firestore)에도 저장
+            if (auth.currentUser) {
+                try {
+                    await setDoc(doc(db, "users", auth.currentUser.uid), { 
+                        lifeGearsData: window.lifeData 
+                    });
+                } catch (error) {
+                    console.error("클라우드 저장 실패:", error);
+                }
+            }
+        };
     </script>
 </body>
 </html>
