@@ -238,11 +238,12 @@
                 <div id="standard-inputs" style="display: none;">
                     <div class="input-section">
                         <div class="input-row">
+                            <!-- 🌟 엔터키(handleKeyPress) 완벽 복구 -->
                             <input type="text" id="cat-input" class="compact-input" placeholder="📁 목록 (예: 건강, 업무)">
                             <label style="font-size:13px; font-weight:700;"><input type="checkbox" id="use-checklist" checked> 체크박스</label>
                         </div>
                         <div class="input-row">
-                            <input type="text" id="item-input" class="compact-input" placeholder="📝 할 일 내용 추가">
+                            <input type="text" id="item-input" class="compact-input" placeholder="📝 할 일 내용 추가" onkeypress="handleKeyPress(event, 'standard', addItem)">
                             <button class="compact-btn" onclick="addItem('standard')">추가</button>
                         </div>
                     </div>
@@ -250,7 +251,7 @@
                 <div id="motto-inputs" style="display: none;">
                     <div class="input-section">
                         <div class="input-row">
-                            <input type="text" id="motto-input" class="compact-input" placeholder="✨ 화면에 나타날 문구 추가">
+                            <input type="text" id="motto-input" class="compact-input" placeholder="✨ 화면에 나타날 문구 추가" onkeypress="handleKeyPress(event, 'motto', addItem)">
                             <button class="compact-btn" onclick="addItem('motto')">추가</button>
                         </div>
                     </div>
@@ -276,7 +277,8 @@
                 <div class="category-header">🔄 대체 할 일 (플랜 B)</div>
                 <div class="input-section">
                     <div class="input-row">
-                        <input type="text" id="alt-input" class="compact-input" placeholder="예: 런닝머신 뛰기">
+                        <!-- 🌟 여기도 엔터키 복구 -->
+                        <input type="text" id="alt-input" class="compact-input" placeholder="예: 런닝머신 뛰기" onkeypress="handleKeyPress(event, null, addAlternative)">
                         <button class="compact-btn" onclick="addAlternative()">추가</button>
                     </div>
                 </div>
@@ -306,9 +308,11 @@
         let currentEditingItemId = null;
         let isLoggedIn = false; 
 
-        // 🌟 수정된 핵심 부분: 파이어베이스가 lifeData를 정확히 읽고 쓸 수 있도록 다리를 놓아줌!
+        // 파이어베이스 통신용 전역 변수
         window.getLifeData = () => lifeData;
         window.setLifeData = (newData) => { lifeData = newData; };
+        window.getCurrentGearId = () => currentGearId;
+        window.renderList = renderList; 
 
         window.saveData = function() {
             localStorage.setItem('lifeGearsDataV6', JSON.stringify(lifeData)); 
@@ -316,6 +320,28 @@
 
         function init() {
             checkDailyReset(); renderGears(); renderControls(); updateStatusMessage(); updateMottoDisplay();
+        }
+
+        // 🌟 안드로이드 뒤로가기 대응 완벽 복구
+        window.addEventListener('popstate', (e) => {
+            if (document.getElementById('edit-view').style.display === 'flex' || document.getElementById('all-list-view').style.display === 'flex') {
+                closeAllViews();
+                document.getElementById('main-view').style.display = 'flex';
+                const gear = lifeData.find(g => g.id === currentGearId);
+                if(gear) document.getElementById('modal-title-text').innerText = gear.name;
+                document.getElementById('edit-title-btn').style.display = 'block'; 
+            } else if (document.getElementById('modal').classList.contains('show')) {
+                document.getElementById('modal').classList.remove('show');
+                currentGearId = '';
+            }
+        });
+
+        // 🌟 엔터키 입력 완벽 복구
+        function handleKeyPress(e, type, callback) {
+            if (e.key === 'Enter') {
+                if (callback === addAlternative) callback();
+                else callback(type);
+            }
         }
 
         function checkDailyReset() {
@@ -405,17 +431,37 @@
             document.getElementById('modal-title-text').innerText = gear.name;
             document.getElementById('edit-title-btn').style.display = 'block'; 
             document.getElementById('modal').classList.add('show');
-            closeAllViews(); document.getElementById('main-view').style.display = 'flex';
-            if (gear.type === 'motto') { document.getElementById('standard-inputs').style.display = 'none'; document.getElementById('motto-inputs').style.display = 'block'; } 
-            else { document.getElementById('standard-inputs').style.display = 'block'; document.getElementById('motto-inputs').style.display = 'none'; }
+            
+            closeAllViews(); 
+            document.getElementById('main-view').style.display = 'flex';
+            
+            // 🌟 모달창 열 때 기존 입력칸 비워두기 기능 완벽 복구
+            if (gear.type === 'motto') { 
+                document.getElementById('standard-inputs').style.display = 'none'; 
+                document.getElementById('motto-inputs').style.display = 'block';
+                document.getElementById('motto-input').value = '';
+            } else { 
+                document.getElementById('standard-inputs').style.display = 'block'; 
+                document.getElementById('motto-inputs').style.display = 'none'; 
+                document.getElementById('cat-input').value = '';
+                document.getElementById('item-input').value = '';
+                document.getElementById('use-checklist').checked = true;
+            }
+            
+            history.pushState({ modalOpen: true }, "");
             renderList();
         }
 
-        function clickCloseModal() { document.getElementById('modal').classList.remove('show'); currentGearId = ''; }
+        function clickCloseModal() { 
+            if (document.getElementById('modal').classList.contains('show')) history.back(); 
+        }
 
         function openAllListView() {
             document.getElementById('modal').classList.add('show'); document.getElementById('modal-title-text').innerText = "전체 목록 보기";
             document.getElementById('edit-title-btn').style.display = 'none'; closeAllViews(); document.getElementById('all-list-view').style.display = 'flex';
+            
+            history.pushState({ view: 'all' }, "");
+
             const container = document.getElementById('all-list-container'); container.innerHTML = '';
             lifeData.forEach(gear => {
                 if (gear.items.length === 0) return;
@@ -491,7 +537,7 @@
             document.getElementById('edit-cat-input').value = item.category || ''; document.getElementById('edit-item-input').value = item.text; document.getElementById('edit-use-checklist').checked = item.hasCheck; renderAlts();
         }
 
-        function closeEditView() { currentEditingItemId = null; openModal(currentGearId); }
+        function closeEditView() { currentEditingItemId = null; history.back(); }
 
         function saveItemEdit() {
             const item = lifeData.find(g => g.id === currentGearId).items.find(i => i.id === currentEditingItemId);
@@ -569,7 +615,6 @@
             }
         };
 
-        // 🌟 실시간 데이터 감지 및 연결
         onAuthStateChanged(auth, (user) => {
             const authBtn = document.getElementById('auth-btn');
             if (user) {
@@ -581,15 +626,18 @@
                 
                 unsubscribe = onSnapshot(docRef, (docSnap) => {
                     if (docSnap.exists() && docSnap.data().lifeGearsData) {
-                        // 클라우드에서 데이터를 가져와서 정확하게 UI 창고에 밀어넣음!
                         window.setLifeData(docSnap.data().lifeGearsData);
                         window.checkDailyReset();
                         window.renderGears();
                         window.renderControls();
                         window.updateStatusMessage();
                         window.updateMottoDisplay();
+                        
+                        // 🌟 모달창이 열려있을 때 다른 기기에서 추가해도 실시간으로 목록에 추가됨!
+                        if (window.getCurrentGearId()) {
+                            window.renderList();
+                        }
                     } else {
-                        // 첫 접속 시 현재 데이터를 클라우드에 씀
                         setDoc(docRef, { lifeGearsData: window.getLifeData() });
                     }
                 }, (error) => {
@@ -605,7 +653,6 @@
             }
         });
 
-        // 🌟 저장할 때 UI 창고의 데이터를 정확하게 꺼내서 클라우드에 올림!
         const originalSaveData = window.saveData;
         window.saveData = async () => {
             originalSaveData();
