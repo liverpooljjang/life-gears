@@ -31,7 +31,7 @@
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg-color: #0f1115;
-                --text-color: #ffffff; /* 다크모드 텍스트를 완전 흰색으로 */
+                --text-color: #ffffff;
                 --card-bg: #1e222a;
                 --border-color: #2a313c;
                 --input-bg: #15181e;
@@ -167,14 +167,13 @@
         }
         .save-btn { background: var(--accent-checked); color: #fff; }
 
-        /* 🌟 [최종 수정] 이미지 디자인과 정확히 일치하도록 수정 */
         .check-label {
             display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 800; 
-            color: var(--text-color); /* 배경색 없이 글자색만 지정 (다크모드시 흰색) */
+            color: var(--text-color);
             cursor: pointer; white-space: nowrap; flex-shrink: 0; padding: 0 4px;
         }
         .check-label input[type="checkbox"] { 
-            accent-color: #3B82F6; /* 딱 찐한 파란색 네모 */
+            accent-color: #3B82F6; 
             transform: scale(1.4); margin: 0; cursor: pointer; 
         }
         
@@ -192,7 +191,7 @@
             border-radius: 50%; outline: none; cursor: pointer; position: relative;
             background-color: var(--input-bg); flex-shrink: 0; transition: all 0.2s ease;
         }
-        .custom-checkbox:checked { background-color: var(--accent-checked); border-color: var(--accent-checked); }
+        .custom-checkbox:checked { background-color: #3B82F6; border-color: #3B82F6; }
         .custom-checkbox:checked::after {
             content: ''; position: absolute; top: 4px; left: 7px; width: 4px; height: 8px; border: solid #ffffff; border-width: 0 2px 2px 0; transform: rotate(45deg);
         }
@@ -256,7 +255,6 @@
                     <div class="input-section">
                         <div class="input-row">
                             <input type="text" id="cat-input" class="compact-input" placeholder="📁 목록 (예: 건강, 업무)">
-                            <!-- 🌟 원상복구된 체크박스와 글자색 -->
                             <label class="check-label">
                                 <input type="checkbox" id="use-checklist" checked> 체크박스
                             </label>
@@ -286,7 +284,6 @@
                 <div class="input-section" id="edit-standard-fields">
                     <div class="input-row">
                         <input type="text" id="edit-cat-input" class="compact-input" placeholder="📁 목록">
-                        <!-- 🌟 수정 뷰 내부도 동일하게 적용 -->
                         <label class="check-label">
                             <input type="checkbox" id="edit-use-checklist"> 체크박스
                         </label>
@@ -341,14 +338,22 @@
             checkDailyReset(); renderGears(); renderControls(); updateStatusMessage(); updateMottoDisplay();
         }
 
+        /* 🌟 뒤로가기(popstate) 로직 완벽 수정 */
         window.addEventListener('popstate', (e) => {
-            if (document.getElementById('edit-view').style.display === 'flex' || document.getElementById('all-list-view').style.display === 'flex') {
+            if (document.getElementById('edit-view').style.display === 'flex') {
+                // 수정 화면에서 뒤로가기 -> 기어 메인 뷰
                 closeAllViews();
                 document.getElementById('main-view').style.display = 'flex';
                 const gear = lifeData.find(g => g.id === currentGearId);
-                if(gear) document.getElementById('modal-title-text').innerText = gear.name;
-                document.getElementById('edit-title-btn').style.display = 'block'; 
+                if(gear) {
+                    document.getElementById('modal-title-text').innerText = gear.name;
+                    document.getElementById('edit-title-btn').style.display = 'block'; 
+                }
+            } else if (document.getElementById('all-list-view').style.display === 'flex') {
+                // 전체 목록에서 뒤로가기 -> 바로 모달 닫기
+                document.getElementById('modal').classList.remove('show');
             } else if (document.getElementById('modal').classList.contains('show')) {
+                // 일반 기어 상세 뷰에서 뒤로가기 -> 모달 닫기
                 document.getElementById('modal').classList.remove('show');
                 currentGearId = '';
             }
@@ -472,12 +477,21 @@
             if (document.getElementById('modal').classList.contains('show')) history.back(); 
         }
 
+        /* 🌟 전체 뷰 열기 / 그리기 기능 완전 분리 (히스토리 꼬임 방지) */
         function openAllListView() {
-            document.getElementById('modal').classList.add('show'); document.getElementById('modal-title-text').innerText = "전체 목록 보기";
-            document.getElementById('edit-title-btn').style.display = 'none'; closeAllViews(); document.getElementById('all-list-view').style.display = 'flex';
+            document.getElementById('modal').classList.add('show'); 
+            document.getElementById('modal-title-text').innerText = "전체 목록 보기";
+            document.getElementById('edit-title-btn').style.display = 'none'; 
+            
+            closeAllViews(); 
+            document.getElementById('all-list-view').style.display = 'flex';
             
             history.pushState({ view: 'all' }, "");
+            renderAllList();
+        }
 
+        /* 전체 목록 렌더링 전용 함수 추가 */
+        function renderAllList() {
             const container = document.getElementById('all-list-container'); container.innerHTML = '';
             lifeData.forEach(gear => {
                 if (gear.items.length === 0) return;
@@ -487,7 +501,7 @@
                 gear.items.forEach(item => {
                     const li = document.createElement('li'); li.style.padding = "8px 12px";
                     let checkedStr = item.isChecked ? 'checked' : '';
-                    let checkBoxHTML = item.hasCheck ? `<input type="checkbox" class="custom-checkbox" onclick="return false;" ${checkedStr}>` : '';
+                    let checkBoxHTML = item.hasCheck ? `<input type="checkbox" class="custom-checkbox" onchange="toggleCheck('${gear.id}', ${item.id}, true)" ${checkedStr}>` : '';
                     li.innerHTML = `<div class="item-content">${checkBoxHTML} <span class="item-text ${checkedStr}">${item.category ? '['+item.category+'] ' : ''}${item.text}</span></div>`;
                     list.appendChild(li);
                 });
@@ -514,7 +528,7 @@
                 categories.forEach(cat => {
                     listEl.innerHTML += `<div class="category-header">${cat || '기본 목록'}</div>`;
                     gear.items.filter(i => i.category === cat).forEach(item => {
-                        const checkHTML = item.hasCheck ? `<input type="checkbox" class="custom-checkbox" onchange="toggleCheck(${item.id})" ${item.isChecked ? 'checked' : ''}>` : '';
+                        const checkHTML = item.hasCheck ? `<input type="checkbox" class="custom-checkbox" onchange="toggleCheck('${gear.id}', ${item.id}, false)" ${item.isChecked ? 'checked' : ''}>` : '';
                         listEl.innerHTML += `<li><div class="item-content">${checkHTML}<span class="item-text ${item.isChecked ? 'checked' : ''}">${item.text}</span></div>
                             <div class="btn-group"><button class="action-btn edit-btn" onclick="openEditView(${item.id})">⚙️ 수정</button></div></li>`;
                     });
@@ -534,9 +548,18 @@
             window.saveData(); renderList(); if (type === 'motto') updateMottoDisplay();
         }
 
-        function toggleCheck(id) {
-            const item = lifeData.find(g => g.id === currentGearId).items.find(i => i.id === id);
-            if (item) { item.isChecked = !item.isChecked; window.saveData(); renderList(); }
+        function toggleCheck(gearId, itemId, isAllView = false) {
+            const gear = lifeData.find(g => g.id === gearId);
+            if (gear) {
+                const item = gear.items.find(i => i.id === itemId);
+                if (item) {
+                    item.isChecked = !item.isChecked; 
+                    window.saveData(); 
+                    /* 🌟 상태를 무한 푸시하지 않고 바로 화면 렌더링만 갱신 */
+                    if (isAllView) renderAllList();
+                    else renderList(); 
+                }
+            }
         }
 
         function deleteMotto(id) {
@@ -598,7 +621,6 @@
         init();
     </script>
 
-    <!-- 파이어베이스 연동 및 실시간 동기화 스크립트 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
