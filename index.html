@@ -158,7 +158,9 @@
         .input-row { display: flex; gap: 8px; align-items: center; }
         .input-row + .input-row { margin-top: 8px; }
         .compact-input {
-            flex: 1; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border-color);
+            flex: 1; 
+            min-width: 0; /* ✨ 모바일 밀림 방지 핵심 코드 */
+            padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border-color);
             background: var(--card-bg); color: var(--text-color); font-size: 14px; font-family: inherit; -webkit-appearance: none;
         }
         .compact-input:focus { outline: 2px solid var(--accent-checked); border-color: transparent; }
